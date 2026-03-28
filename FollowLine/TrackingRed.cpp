@@ -19,6 +19,7 @@ int main() {
 
     Scalar low_red2(170,120,70);
     Scalar upper_red2(179,255,255);
+
     
     while(true) {
         cap.read(frame);
@@ -36,15 +37,33 @@ int main() {
         bitwise_or(mask1,mask2,mask);
 
         //morphological opening -> Removes noise
-        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5))); 
 
         //morphological closing -> Fixes object shape
-        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5))); 
+        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+        Moments img_moments = moments(mask);
+
+        double m00 = img_moments.m00;
+        double m10 = img_moments.m10;
+        double m01 = img_moments.m01;
+
+        Mat mask_color;
+        cvtColor(mask, mask_color, COLOR_GRAY2BGR);
+
+        if (m00 > 10000){
+
+            int ctr_x = m10/m00;
+            int ctr_y = m01/m00;
+
+            circle(mask_color, Point(ctr_x,ctr_y), 5, Scalar(0,0,255), -1);
+
+        }
 
         imshow("Camera", frame);
-        imshow("Mask", mask);
+        imshow("Mask", mask_color);
 
         if(waitKey(1) == 27) break;
     }
