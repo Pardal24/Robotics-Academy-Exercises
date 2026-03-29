@@ -31,7 +31,7 @@ More exercises and improvements will be added over time.
 
 ---
 
-##Reference
+## Reference
 
 - Stack Overflow
 - OpenCV docs: https://docs.opencv.org/4.x/index.html
