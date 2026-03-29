@@ -8,6 +8,8 @@ Currently, the repository is a **work in progress** and far from complete. As I 
 
 Alongside the main exercise solutions, this repository may also include additional scripts and experimental code used to test specific components (such as perception modules or control strategies). These intermediate scripts help validate individual parts of the system before integrating them into the final solution.
 
+**NOTE:** These exercises are not intended to be completed using AI assistance. Their purpose is to help me develop my own understanding and ability to solve them independently.
+
 ---
 
 ## Current Progress
@@ -26,3 +28,11 @@ Alongside the main exercise solutions, this repository may also include addition
 ---
 
 More exercises and improvements will be added over time.
+
+---
+
+##Reference
+
+- Stack Overflow
+- OpenCV docs: https://docs.opencv.org/4.x/index.html
+- OpenCV Tutorial C++: https://www.opencv-srf.com/p/introduction.html 
