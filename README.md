@@ -34,6 +34,7 @@ More exercises and improvements will be added over time.
 
 ## Reference
 
+- Robotics Academy: https://jderobot.github.io/RoboticsAcademy/
 - Stack Overflow
 - OpenCV docs: https://docs.opencv.org/4.x/index.html
 - OpenCV Tutorial C++: https://www.opencv-srf.com/p/introduction.html 
