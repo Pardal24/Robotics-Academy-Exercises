@@ -14,7 +14,8 @@ Alongside the main exercise solutions, this repository may also include addition
 
 ## Current Progress
 
-- 🚧 **Follow the Line** (in progress)
+- ✅ **Follow the Line**
+- 🚧 **Local navigation with VFF** (Starting...)
 
 ---
 
