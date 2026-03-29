@@ -30,7 +30,7 @@ public:
             "/cam_f1_left/image_raw", 10,
             std::bind(&CarNode::topic_callback, this, std::placeholders::_1));
         
-        publisher_ = this->create_publisher<sensor_msgs::msg::Image>("/red_line",10);
+        //publisher_ = this->create_publisher<sensor_msgs::msg::Image>("/red_line",10);
 
         vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
 
@@ -59,21 +59,46 @@ private:
             Scalar upper_red2(179,255,255);
 
             Mat mask1, mask2;
-            inRange(hsv, low_red1, upper_red1, mask1 );
+            inRange(hsv, low_red1, upper_red1, mask1);
             inRange(hsv, low_red2, upper_red2, mask2);
 
             Mat mask;
             bitwise_or(mask1,mask2,mask);
-            
-            cv_bridge::CvImage img_bridge;
-            const sensor_msgs::msg::Image::SharedPtr img_msg;
 
-            std_msgs::Header header; 
-            header.seq = counter; 
-            header.stamp = ros::Time::now(); 
-            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, mask);
-            img_bridge.toImageMsg(img_msg);
-            publisher_->publish(img_msg);
+            //morphological opening -> Removes noise
+            erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+            dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+            //morphological closing -> Fixes object shape
+            dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+            erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+            Moments img_moments = moments(mask);
+
+            double m00 = img_moments.m00;
+            double m10 = img_moments.m10;
+            double m01 = img_moments.m01;
+
+            if (m00 > 10000)
+            {
+                int ctr_x = m10/m00;
+                int ctr_y = m01/m00;
+
+                std::cout << "Centroid x: " << ctr_x << ", y: " << ctr_y << std::endl;
+
+            }
+
+
+            
+            // cv_bridge::CvImage img_bridge;
+            // const sensor_msgs::msg::Image::SharedPtr img_msg;
+
+            // std_msgs::Header header; 
+            // header.seq = counter; 
+            // header.stamp = ros::Time::now(); 
+            // img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, mask);
+            // img_bridge.toImageMsg(img_msg);
+            // publisher_->publish(img_msg);
 
         }
 

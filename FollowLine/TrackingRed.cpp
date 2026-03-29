@@ -38,10 +38,10 @@ int main() {
 
         //morphological opening -> Removes noise
         erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5))); 
+        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
         //morphological closing -> Fixes object shape
-        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5))); 
+        dilate(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
         erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
         Moments img_moments = moments(mask);
