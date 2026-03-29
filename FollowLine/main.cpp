@@ -24,7 +24,13 @@ class CarNode : public rclcpp::Node
 {
 public:
     CarNode()
-    : Node("car_node")
+    : Node("car_node"),
+        k_p_(1.0),
+        k_i_(0.0),
+        k_d_(0.0),
+        dt_(0.001),
+        err_prev_(0.0),
+        integral_(0.0)
     {
         subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
             "/cam_f1_left/image_raw", 10,
@@ -33,18 +39,23 @@ public:
         publisher_ = this->create_publisher<sensor_msgs::msg::Image>("/red_line",10);
 
         vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
-
         //timer_ = this->create_wall_timer(100ms, std::bind(&CarNode::time_cycle, this));
     }
-
+    
 private:
+
+    float k_p_;
+    float k_i_;
+    float k_d_;
+    float dt_;
+    float err_prev_;
+    float integral_;
 
     void topic_callback(const sensor_msgs::msg::Image::SharedPtr msg)
     {
         cv_bridge::CvImagePtr cv_ptr;
 
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-
         if(cv_ptr){
             Mat image = cv_ptr->image;
 
@@ -81,6 +92,9 @@ private:
 
             Mat mask_color;
             cvtColor(mask, mask_color, COLOR_GRAY2BGR);
+            
+            int w = msg->width;
+            int ctr_imgx = w/2;
 
             if (m00 > 10000)
             {
@@ -89,7 +103,17 @@ private:
 
                 circle(mask_color, Point(ctr_x,ctr_y), 5, Scalar(0,0,255), -1);
 
-                //std::cout << "Centroid x: " << ctr_x << ", y: " << ctr_y << std::endl;
+
+                int err = ctr_imgx - ctr_x;
+                integral_ += err * dt_;
+                float derivative = (err - err_prev_) / dt_;
+                
+                auto message = geometry_msgs::msg::Twist();
+                message.linear.x = 2.0;
+                message.angular.z = (k_p_ * err) + (k_i_ * integral_) + (k_d_ * derivative);
+                vel_publisher_->publish(message);
+
+                err_prev_ = err;
 
             }
 
@@ -110,7 +134,6 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr publisher_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr vel_publisher_;
     rclcpp::TimerBase::SharedPtr timer_;
-
     sensor_msgs::msg::Image::SharedPtr last_msg_;
 };
 
