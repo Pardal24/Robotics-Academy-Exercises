@@ -7,8 +7,8 @@
 #include <functional>
 #include <opencv2/opencv.hpp>
 #include <iostream>
-//#include <sensor_msgs/Image.h>
-//#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/image_encodings.hpp>
 #include <cv_bridge/cv_bridge.h>
 
 #include "rclcpp/rclcpp.hpp"
@@ -30,7 +30,7 @@ public:
             "/cam_f1_left/image_raw", 10,
             std::bind(&CarNode::topic_callback, this, std::placeholders::_1));
         
-        //publisher_ = this->create_publisher<sensor_msgs::msg::Image>("/red_line",10);
+        publisher_ = this->create_publisher<sensor_msgs::msg::Image>("/red_line",10);
 
         vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
 
@@ -79,26 +79,27 @@ private:
             double m10 = img_moments.m10;
             double m01 = img_moments.m01;
 
+            Mat mask_color;
+            cvtColor(mask, mask_color, COLOR_GRAY2BGR);
+
             if (m00 > 10000)
             {
                 int ctr_x = m10/m00;
                 int ctr_y = m01/m00;
 
-                std::cout << "Centroid x: " << ctr_x << ", y: " << ctr_y << std::endl;
+                circle(mask_color, Point(ctr_x,ctr_y), 5, Scalar(0,0,255), -1);
+
+                //std::cout << "Centroid x: " << ctr_x << ", y: " << ctr_y << std::endl;
 
             }
 
+            std_msgs::msg::Header header;
+            header.stamp = this->get_clock()->now();
 
-            
-            // cv_bridge::CvImage img_bridge;
-            // const sensor_msgs::msg::Image::SharedPtr img_msg;
+            sensor_msgs::msg::Image::SharedPtr out_msg =
+                cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, mask_color).toImageMsg();
 
-            // std_msgs::Header header; 
-            // header.seq = counter; 
-            // header.stamp = ros::Time::now(); 
-            // img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB8, mask);
-            // img_bridge.toImageMsg(img_msg);
-            // publisher_->publish(img_msg);
+            publisher_->publish(*out_msg);
 
         }
 
