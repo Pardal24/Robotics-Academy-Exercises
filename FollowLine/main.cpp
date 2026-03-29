@@ -24,13 +24,13 @@ class CarNode : public rclcpp::Node
 {
 public:
     CarNode()
-    : Node("car_node"),
-        k_p_(1.0),
-        k_i_(0.0),
-        k_d_(0.0),
-        dt_(0.001),
-        err_prev_(0.0),
-        integral_(0.0)
+    :  Node("car_node"),
+    k_p_(1.0),
+    k_i_(0.0),
+    k_d_(0.0),
+    dt_(0.001),
+    err_prev_(0.0),
+    integral_(0.0)
     {
         subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
             "/cam_f1_left/image_raw", 10,
@@ -43,7 +43,6 @@ public:
     }
     
 private:
-
     float k_p_;
     float k_i_;
     float k_d_;
@@ -109,8 +108,15 @@ private:
                 float derivative = (err - err_prev_) / dt_;
                 
                 auto message = geometry_msgs::msg::Twist();
-                message.linear.x = 2.0;
-                message.angular.z = (k_p_ * err) + (k_i_ * integral_) + (k_d_ * derivative);
+                message.linear.x = 1.0;
+                float out = (k_p_ * err) + (k_i_ * integral_) + (k_d_ * derivative);
+                //message.angular.z = out;
+
+                std::cout << "Kp: " << k_p_ 
+                        << " Ki: " << k_i_ 
+                        << " Kd: " << k_d_ 
+                        << "out: " << out << std::endl;
+
                 vel_publisher_->publish(message);
 
                 err_prev_ = err;
