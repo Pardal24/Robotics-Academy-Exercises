@@ -1,0 +1,17 @@
+The objective of this exercise is to implement the logic of the VFF navigation algorithm.
+
+In navigation using a VFF (Virtual Force Field):
+
+ - Each object in the environment generates a repulsion force against the robot.
+
+ - The destination generates a force of attraction which pulls the robot.
+
+Side Quests: 
+- Go as quickly as possible.
+
+- Choose the safest route.
+
+- Obstacles in movement.
+
+- Robustness in situations of indecision (zero vector sum).
+
