@@ -1,8 +1,8 @@
-# Robotics Academy Exercises – ROS2 (C++)
+# Robotics Academy Exercises
 
 This repository will contain my implementations of several exercises from the **Robotics Academy** platform. The goal of this project is to practice and deepen my understanding of robotics concepts such as perception, control, and autonomous behavior through hands-on programming tasks.
 
-The exercises are developed using **ROS2 Humble** and implemented in **C++**.
+The exercises are developed using **ROS2 Humble** and implemented in **C++** & **Python**.
 
 Currently, the repository is a **work in progress** and far from complete. As I progress through the Robotics Academy challenges, I will continue adding new solutions, improvements, and supporting tools.
 
@@ -14,8 +14,8 @@ Alongside the main exercise solutions, this repository may also include addition
 
 ## Current Progress
 
-- ✅ **Follow the Line**
-- 🚧 **Local navigation with VFF** (Starting...)
+- ✅ **Follow the Line (C++)**
+- 🚧 **Local navigation with VFF (Python)** (Starting...)
 
 ---
 
