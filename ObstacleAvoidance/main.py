@@ -12,22 +12,21 @@ class CarNode(Node):
     def __init__(self):
         super().__init__('car_node')
         self.steer_pub_ = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.odom_sub_ = self.create_subscription(Odometry, '/odom', self.listener_callback, 10)
+        self.odom_sub_ = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         # The field ranges in sensor_msgs/msg/LaserScan contains the measured distances expressed in meters.
         self.laser_sub_ = self.create_subscription(LaserScan, '/f1/laser/scan', self.listener_callback, 10)
-        timer_period = 0.5
-        self.timer = self.create_timer(timer_period, self.timer_callback)
 
-    def timer_callback(self):
-        msg = Twist()
-        #msg.data = 'Hello World: %d' % self.i
-        #self.steer_publisher_.pub(msg)
-        self.get_logger().info('Publishing')
-    
+    def odom_callback(self,odom):
+        lin = odom.twist.twist.linear
+        self.get_logger().info(f"Linear velocity: x={lin.x}, y={lin.y}, z={lin.z}")
+
     def listener_callback(self, msg):
-        self.get_logger().info('Receiving')
-    
-    def parse_laser_data(laser_data):
+        if len(msg.ranges) > 0:
+            laser_polar, laser_xy = parse_laser_data(msg)
+        self.get_logger().info(f"Laser polar: {laser_polar} \n Laser_xy: {laser_xy}")
+
+
+def parse_laser_data(laser_data):
         # Parses the LaserData object and returns a tuple with two lists:
         # 1. List of  polar coordinates, with (distance, angle) tuples,
         #    where the angle is zero at the front of the robot and increases to the left.
@@ -48,7 +47,7 @@ class CarNode(Node):
             # (i=180)    <----R      (i=0)
 
             # Extract the distance at index i
-            dist = laser_data.values[i]
+            dist = laser_data.ranges[i]
             # The final angle is centered (zeroed) at the front of the robot.
             angle = math.radians(i - 90)
             laser_polar += [(dist, angle)]
@@ -58,31 +57,31 @@ class CarNode(Node):
             laser_xy += [(x, y)]
         return laser_polar, laser_xy
 
-    def absolute2relative (x_abs, y_abs, robotx, roboty, robott):
 
-        # robotx, roboty are the absolute coordinates of the robot
-        # robott is its absolute orientation
-        # Convert to relatives
-        dx = x_abs - robotx
-        dy = y_abs - roboty
+def absolute2relative (x_abs, y_abs, robotx, roboty, robott):
 
-        # Rotate with current angle
-        x_rel = dx * math.cos (-robott) - dy * math.sin (-robott)
-        y_rel = dx * math.sin (-robott) + dy * math.cos (-robott)
+    # robotx, roboty are the absolute coordinates of the robot
+    # robott is its absolute orientation
+    # Convert to relatives
+    dx = x_abs - robotx
+    dy = y_abs - roboty
 
-        return x_rel, y_rel
+    # Rotate with current angle
+    x_rel = dx * math.cos (-robott) - dy * math.sin (-robott)
+    y_rel = dx * math.sin (-robott) + dy * math.cos (-robott)
+
+    return x_rel, y_rel
 
 
 
 def main(args=None):
-    #rclpy.init(args=args)
+    rclpy.init(args=args)
 
     car_node = CarNode()
-
     rclpy.spin(car_node)
 
-    #car_node.destroy_node()
-    #rclpy.shutdown()
+    car_node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
