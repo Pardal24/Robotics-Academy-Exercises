@@ -105,6 +105,18 @@ private:
         }
     }
 
+    void save_waypoints()
+    {
+        std::ofstream file("waypoints.txt");
+
+        for (const auto& wp : waypoints_)
+        {
+            file << wp.first << " " << wp.second << std::endl;
+        }
+
+        file.close();
+    }
+
     void topic_callback(const sensor_msgs::msg::Image::SharedPtr msg)
     {
         cv_bridge::CvImagePtr cv_ptr;
@@ -198,17 +210,7 @@ private:
     sensor_msgs::msg::Image::SharedPtr last_msg_;
 };
 
-void save_waypoints()
-{
-    std::ofstream file("waypoints.txt");
 
-    for (const auto& wp : waypoints_)
-    {
-        file << wp.first << " " << wp.second << std::endl;
-    }
-
-    file.close();
-}
 
 void exercise() {
     //Frequency freq = Frequency();
